@@ -1,0 +1,409 @@
+﻿		/*** Edgar Martínez Retes, Leonardo Cervantes Pérez, Gabriel Enrique Lascurain Flores ***/
+        / *** Septiembre 8, 2024 ***/
+        
+        /*** Obtener la temperatura mas baja y mas alta ***/
+        /*** Declaracion del codigo ***/
+		Load	 Addr	    /Carga la direccion del primer valor de la tabla
+		Store	 Next	    /Almacena la direccion en el apuntador Next
+		Load 	 Num	    /Carga el número de lecturas de temp que serán evaluadas
+		Subt	 One	    /Decrementa en 1
+		Store	 Ctr	    /Almacena este valor en Ctr para determinar el número de ciclos
+        Clear               /Inicializa Index a 0
+        Store    Index      /Index comienza desde 0
+CicloMinMax, LoadI 	 Next	    /Leer la temperatura apuntada por Next
+		Subt	 Min        /Checar si la temperatura leída es menor a Min
+		Skipcond 800        /No es menor, salta una línea
+        JnS		 SubMin     /Si es menor, ir a la subrutina para almacenar Min
+        LoadI 	 Next	    /Leer la temperatura apuntada por Next
+        Subt	 Max        /Checar si la temperatura leída es mayor a Max
+        Skipcond 000        /No es mayor, salta una línea
+        Jns		 SubMax     /Si es mayor, ir a la subrutina para almacenar Max
+
+        /*** Avanza a la siguiente temperatura ***/
+        Load	 Next	    /Carga Next
+		Add	 	 One	    /Incrementa en 1 para apuntar a la siguiente dirección
+		Store	 Next	    /Almacena el nuevo apuntador en Next
+        Load     Index      /Carga el valor actual de Index
+        Add      One        /Incrementa Index
+        Store    Index      /Almacena el nuevo valor de Index
+		Load	 Ctr	    /Carga la variable de control de ciclo Ctr
+		Subt	 One	    /Resta 1 de Ctr
+		Store	 Ctr	    /Almacena el nuevo valor en Ctr
+		Skipcond 000	    /Si Ctr < 0, salta la siguiente instrucción
+		Jump	 CicloMinMax /De lo contrario, salta al ciclo CicloMinMax
+
+        /*** Mandar Min, Max, MinIndex y MaxIndex a Output ***/
+        Load 	 Min        /Carga el valor de la temperatura mínima
+        Output				/Despliega el valor en la ventana de Output
+        Load     MinIndex   /Carga el índice de la temperatura mínima
+        Jump MultMin		/Ir a la subrutina para multiplicar los segundos por 10
+PrintMin, Load Seconds		/Cargar el timepo cuando se dio al temperatura
+        Output				/Despliega el índice de la temperatura mínima
+        Load 	 Max        /Carga el valor de la temperatura máxima
+        Output				/Despliega el valor en la ventana de Output
+        
+        Load Zero			/Cargar cero
+        Store Seconds		/reestablecer el tiempo total a cero
+        
+        Load     MaxIndex   /Carga el índice de la temperatura máxima
+        Jump MultMax		/Saltar a la subrutina para multiplicar por 10
+PrintMax, Load Seconds		/ Cargar los segundos totales
+        Output				/Despliega el índice de la temperatura máxima
+      
+  
+      
+        
+         /*** Ordenar las Temperaturas de la tabla ascendentemente y obtener la mediana***/
+        /*** Usando algorithmo de Buuble Sort ***/
+
+         /*** Declaracion del codigo ***/
+Ciclo1,	Load	 Addr	/Carga la direccion del primer valor a sortear		
+		Store	 Next	/Almacena la direccion en el apuntador Next
+        
+        Clear           /Asumir que no hemos realizado un Swap
+        Store    Swap   /Swap = 0
+        
+		Load 	 Num	/Carga el numero de lecturas de Temp que seran Sorteadas		
+		Subt	 One	/Decrementa en 1 		
+		Store	 Ctr	/Almacena es valor en Ctr para determinar el numero de ciclos
+        
+Ciclo2,	LoadI 	 Next	/Lee la temperatura apuntada por Next
+		Store  	 Value1 /Almacena temperatura leida en Value1
+        
+        Load     Next	/Carga el apuntador Next
+        Add 	 One    /Incrementa apuntador Next en 1
+        Store    Next   /Guarda nuevo valor del apuntador Next
+        
+        LoadI	 Next   /Lee la temperatura apuntada por Next
+        Store 	 Value2 /Almacena temperatura leida en Value2
+        
+        Load     Next	/Regresar Next a su valor original
+        Subt     One    /Restandole 1
+        Store    Next   /Y almacenando el valor de apuntador Next
+        
+        Load     Value2 /Determinar si hay que hacer un intercambio
+        Subt     Value1 /Checando si Value1 > Value 2
+        Skipcond 000    /Hay que realizar un intercambio de valores
+        Jump     NoSwap /No hay que realizar un intercambio de valores
+        JnS      SubSwap/Llamar a la subrutina para realizar intercambio       
+        
+NoSwap,	Load	 Next	/Carga Next		
+		Add	 	 One	/Incrementa en 1 para apuntar a la siguiente direccion	
+		Store	 Next	/Almacena el apuntador en Next
+        
+		Load	 Ctr	/Carga la variable de control de ciclo Ctr		
+		Subt	 One	/Resta 1 de la variable de control de ciclo		
+		Store	 Ctr	/Almacena el nuevo valor en la varibale de control de ciclo Ctr
+        
+		Skipcond 000	/Si Ctr < 0, saltarse la siguiente instruccion
+        
+		Jump	 Ciclo2	/De lo contrario, salta a Ciclo	
+		
+        Load 	 Swap   /Si se realizo al menos un Swap, continuar sorteando
+        Skipcond 400    /Ya no es necesario realizar mas sorteos
+        Jump     Ciclo1 /Continua sorteando
+        
+        /*** Buscar el valor mediano ***/
+        
+        Load Addr /Cargar la direccion del primer valor la tabla de temperaturas
+        Store Next /Guardar esta direccion en la variable Next que es el iterador
+        Load Num	/Cargar el número total de temperaturas
+        Store Ctr	/Establecer el contador con el numero de registros
+        /*** Buscar índice mitad ***/
+Division, Load DivCtr /Cargar el contador que representa el cociente de la división
+        Add One /Agregarle uno por cada iteración
+        Store DivCtr /Guardar el valor en la memoria
+        
+		Load Ctr /Cargar el contador
+        Subt Two /Restarle dos al contador
+        Store Ctr /Guardar el valor en la memoria
+        Skipcond 000 /Si ya no se puede restar dos, ya no se añade al cociente
+        Jump Division /Volver al ciclo para seguir añadiendo al cociente
+        
+        Load DivCtr /Cargar el cociente
+        
+        Skipcond 400 / Si es 0 (dividir un número par), añadirle uno al cociente (La mitad acaba en .5)
+        Jump IterateMed / Saltar a la función para conseguir la mediana
+        Add One /Si es par, agregarle uno al cociente, simulando (n+1)/2
+        
+IterateMed, Store DivCtr /Guardar el cociente en la memoria
+        
+        Load Next /Cargar la dirección de Next
+        Add One /Mover una posición al Next al sumarle 1
+        Store Next /Guardar la nueva dirección en la memoria
+        
+        Load DivCtr /Cargar el cociente
+        Subt One /Restarle uno al cociente en cada iteración
+        Store DivCtr /Guardar el valor en la memoria
+        
+        Skipcond 000 /Si llega a 0 el cociente, esa es la mediana
+        Jump IterateMed / Si aún no es 0, seguir iterando
+        LoadI Next /Si llega a 0, cargar el valor de la dirección Next
+        Output /Imprimir el valor de la medianta que se encuentra en Next
+        
+     
+     
+     
+      /*** Convertir temperaturas a grados Farenheit ***/
+      	Load Addr /Cargar la dirección del primer valor de la tabla de grados Celsius
+      	Store Next /Guardar la dirección en la variable Next, el iterador
+      	Load Num /Cargar el número de registros de temperaturas
+      	Store Ctr /Establecer el contador con la variable Num en la memoria
+     	Load AddrF /Cargar la dirección del primer valor de la tabla Farenheit
+      	Store NextF /Guardar la dirección en la variable NextF, el iterador para la segunda tabla
+        
+CicloCtr, LoadI Next /El ciclo principal para recorrer la tabla de Celsius. Se carga el valor de Next que se va a convertir
+        Store TempInd / Se guarda este valor en la variable TemInd
+        
+F_index,  Load TempInd /El ciclo para recorrer la tabla de Farenheit. Se carga la variable TempInd
+        Subt One /Se suma uno a la variable
+        Store TempInd /Se guarda en la memoria el valor
+        Skipcond 000     /Si TempInd < 0, se imprime el valor donde se ecuentra el iterador de Farenheit
+        Jump     CicloF /Saltar a la subrutina que mueve el iterador en la tabla Farenheit
+        
+        LoadI NextF /Se carga el valor de la dirección de NextF
+        Output /Se imprime la conversión correspondiente a Farenheit
+        
+        Load AddrF /Cargar la dirección del primer valor de la tabla Farenheit
+        Store NextF /Se reestablece la variable NextF en la memoria para apuntar al primer valor
+   
+        Load Next /Se carga la variable Next
+        Add One /Se mueve una posición de memoria al sumarle 1
+        Store Next /Se guarda en la memoria la nueva dirección
+        
+        LoadI Next /Se consigue el nuevo valor a evaluar desde la dirección de Next
+        Store TempInd /Se guarda el nuevo valor en el índice temporal
+        
+        Load Ctr /Se carag el contador
+        Subt One /Se resta uno al contador
+        Store Ctr /Se guarda el valor en la memoria
+
+        Skipcond 000     /Si Ctr < 0, terminar el ciclo ya que se recorrió toda la tabla de Celsius
+        Jump CicloCtr /Volver al ciclo hasta terminar de iterar toda la tabla de Celsius
+        Halt /Terminar ejecución
+        
+        /*** Seccion de Variables y Constantes ***/
+Addr,	Adr	 Temp		/Las temperaturas que seran sumadas	
+AddrF,	Adr	TempCF		/Localidad de la tabla con grados Farenheit
+Index,  Dec 0			/Índice auxiliar para marcar el índice mayor y menor
+MinIndex, Dec 0			/Índice donde se encuentra la menor temperatura
+MaxIndex, Dec 0			/Índice donde se encuentra la mayor temperatura
+Seconds, Dec 0			/Variable que guarda los segundos para la temperatura mayor o menor
+Ten, Dec 10				/Constante usada para incrementar en 10
+Zero, Dec 0				/Constante utilizada para reestablecer variables a 0
+Next,	Hex	 0			/Apuntador al siguiente valor de la tabla
+NextF,	Hex	 0			/Apuntador tabla Farenheit
+Num,	Dec	 30			/El total de temperaturas	
+Sum,	Dec	 0	 		/La suma total de los valores de las temperaturas		
+Min,	Dec	 999		/Variable que se usa para definir si las temperaturas son menores
+Max,    Dec  0			/Variable que se usa para definir si las temperaturas son mayores
+Value1,	Dec	 0			/Primer Valor a comparar		
+Value2,	Dec	 0			/Segundo valor a comparar
+Swap,   Dec  0			/Bandera que indica si hubo Swap (Swap = 1) o no
+Ctr,	Hex	 0			/Variable de control de ciclo	
+DivCtr,	Hex	 -1			/Variable de control para dividir entre 2	
+One,	Dec	 1			/Constante usada para decrementar en 1
+Two,	Dec	 2			/Constante usada para decrementar en 2
+TempInd,  Dec 0			/Índice que define hasta donde llega la iteración de Farenheit
+		/*** Seccion de la tabla de temperaturas del Jeep	***/
+        /*** Se tomo una lectura cada 10 segundos         	***/
+        /*** Lecturas en grados centigrados               	***/
+Temp,	Dec	 30			
+		Dec	 40
+		Dec	 50
+		Dec	 60
+		Dec	 70
+		Dec	 80			
+		Dec	 70
+		Dec	 60
+		Dec	 50
+		Dec	 60
+		Dec	 70			
+		Dec	 80
+		Dec	 90
+		Dec	 80
+		Dec	 70
+		Dec	 60			
+		Dec	 50
+		Dec	 40
+		Dec	 30
+		Dec	 20
+		Dec	 10			
+		Dec	 20
+		Dec	 30
+		Dec	 40
+		Dec	 50
+		Dec	 60			
+		Dec	 70
+		Dec	 50
+		Dec	 40
+		Dec	 30
+        /*** Seccion de la tabla de temperaturas en Farenheit desde 0 a 100 grados Celsius	***/
+TempCF,	Dec 32 /0° Celsius
+		Dec 34 /1° Celsius
+        Dec 36 /2° Celsius
+        Dec 37 /3° Celsius
+        Dec 39 /4° Celsius
+        Dec 41 /5° Celsius
+        Dec 43 /6° Celsius
+        Dec 45 /7° Celsius
+        Dec 46 /8° Celsius
+        Dec 48 /9° Celsius
+        Dec 50 /10° Celsius
+        Dec 52  / 11° Celsius
+        Dec 54  / 12° Celsius
+        Dec 55  / 13° Celsius
+        Dec 57  / 14° Celsius
+        Dec 59  / 15° Celsius
+        Dec 61  / 16° Celsius
+        Dec 63  / 17° Celsius
+        Dec 64  / 18° Celsius
+        Dec 66  / 19° Celsius
+        Dec 68  / 20° Celsius
+        Dec 70  / 21° Celsius
+        Dec 72  / 22° Celsius
+        Dec 73  / 23° Celsius
+        Dec 75  / 24° Celsius
+        Dec 77  / 25° Celsius
+        Dec 79  / 26° Celsius
+        Dec 81  / 27° Celsius
+        Dec 82  / 28° Celsius
+        Dec 84  / 29° Celsius
+        Dec 86  / 30° Celsius
+        Dec 88  / 31° Celsius
+        Dec 90  / 32° Celsius
+        Dec 91  / 33° Celsius
+        Dec 93  / 34° Celsius
+        Dec 95  / 35° Celsius
+        Dec 97  / 36° Celsius
+        Dec 99  / 37° Celsius
+        Dec 100 / 38° Celsius
+        Dec 102 / 39° Celsius
+        Dec 104 / 40° Celsius
+        Dec 106 / 41° Celsius
+        Dec 108 / 42° Celsius
+        Dec 109 / 43° Celsius
+        Dec 111 / 44° Celsius
+        Dec 113 / 45° Celsius
+        Dec 115 / 46° Celsius
+        Dec 117 / 47° Celsius
+        Dec 118 / 48° Celsius
+        Dec 120 / 49° Celsius
+        Dec 122 / 50° Celsius
+        Dec 124 / 51° Celsius
+        Dec 126 / 52° Celsius
+        Dec 127 / 53° Celsius
+        Dec 129 / 54° Celsius
+        Dec 131 / 55° Celsius
+        Dec 133 / 56° Celsius
+        Dec 135 / 57° Celsius
+        Dec 136 / 58° Celsius
+        Dec 138 / 59° Celsius
+        Dec 140 / 60° Celsius
+        Dec 142 / 61° Celsius
+        Dec 144 / 62° Celsius
+        Dec 145 / 63° Celsius
+        Dec 147 / 64° Celsius
+        Dec 149 / 65° Celsius
+        Dec 151 / 66° Celsius
+        Dec 153 / 67° Celsius
+        Dec 154 / 68° Celsius
+        Dec 156 / 69° Celsius
+        Dec 158 / 70° Celsius
+        Dec 160 / 71° Celsius
+        Dec 162 / 72° Celsius
+        Dec 163 / 73° Celsius
+        Dec 165 / 74° Celsius
+        Dec 167 / 75° Celsius
+        Dec 169 / 76° Celsius
+        Dec 171 / 77° Celsius
+        Dec 172 / 78° Celsius
+        Dec 174 / 79° Celsius
+        Dec 176 / 80° Celsius
+        Dec 178 / 81° Celsius
+        Dec 180 / 82° Celsius
+        Dec 181 / 83° Celsius
+        Dec 183 / 84° Celsius
+        Dec 185 / 85° Celsius
+        Dec 187 / 86° Celsius
+        Dec 189 / 87° Celsius
+        Dec 190 / 88° Celsius
+        Dec 192 / 89° Celsius
+        Dec 194 / 90° Celsius
+        Dec 196 / 91° Celsius
+        Dec 198 / 92° Celsius
+        Dec 199 / 93° Celsius
+        Dec 201 / 94° Celsius
+        Dec 203 / 95° Celsius
+        Dec 205 / 96° Celsius
+        Dec 207 / 97° Celsius
+        Dec 208 / 98° Celsius
+        Dec 210 / 99° Celsius
+        Dec 212 / 100° Celsius
+        
+		/*** Seccion de subrutinas ***/
+        
+MultMin, Load MinIndex /Se carga el índice menor
+		Subt One /Se resta uno en cada iteración
+        Store MinIndex /Guarda el valor en la memoria
+        Load Seconds /Cargar la variable segundos
+        Add Ten /Añadirle 10 cada iteración
+        Store Seconds /Guardar el valor en la memoria
+        Load MinIndex /Se carga el valor de la variable MinIndex
+        Skipcond 400 /Si es 0 regresar al procedimiento principal
+        Jump MultMin /Se repite la función
+        Jump PrintMin /Salto a la etiqueta PrintMin
+        
+MultMax, Load MaxIndex /Se carga el índice mayor
+		Subt One /Se resta uno en cada iteración
+        Store MaxIndex /Guarda el valor en la memoria
+        Load Seconds /Cargar la variable segundos
+        Add Ten /Añadirle 10 cada iteración
+        Store Seconds /Guardar el valor en la memoria
+        Load MaxIndex /Se carga el valor de la variable MaxIndex
+        Skipcond 400 /Si es 0 regresar al procedimiento principal
+        Jump MultMax /Se repite la función
+        Jump PrintMax /Salto a la etiqueta PrintMAx
+        
+ 
+SubMin,	Hex 0			    /Dirección de retorno de subrutina
+		LoadI Next		    /Leer la temperatura de la tabla
+        Store Min		    /Almacenar la temperatura en Min
+        Load  Index         /Cargar el índice actual
+        Store MinIndex      /Almacenar el índice en MinIndex
+        JumpI SubMin	    /Regresar a la siguiente instrucción de la llamada
+
+SubMax, Hex 0			    /Dirección de retorno de subrutina
+		LoadI Next		    /Leer la temperatura de la tabla
+        Store Max		    /Almacenar la temperatura en Max
+        Load  Index         /Cargar el índice actual
+        Store MaxIndex      /Almacenar el índice en MaxIndex
+		JumpI SubMax	    /Regresar a la siguiente instrucción de la llamada
+        
+         /*** Subrutina que realiza intercambio de 2 valores
+SubSwap,Hex 0			/Direccion de regreso de subrutina
+        Load   Value2	/Leer el segundo Valor Value2
+		StoreI Next		/Almacenarlo en la direccion apuntada por Next
+
+        Load   Next     /Apuntar a la siguiente localidad de la tabla
+        Add    One		/Incrementando el apuntador en 1
+        Store  Next     /Almacenar en el apuntador Next
+        
+        Load   Value1	/Leer el primer valor Value1
+        StoreI Next		/Almacenarlo en la direccion apuntada por Next		
+        
+        Load   Next		/Recuperar el valor original del apuntador Next
+        Subt   One		/Restando 1
+        Store  Next		/Guardando el valor el apuntador Next
+        
+        Clear			/Prender bandera de Swap
+        Add    One		/Dandole el valor de 1
+        Store  Swap		/Y almacenandolo
+        
+        JumpI  SubSwap     /Regresar a la siguiente instruccion de la llamada
+        
+CicloF, Load NextF /Se carga la dirección de NextF de la tabla de Farenheit
+		Add One /Se mueve a la siguiente dirección al agregarle 1
+        Store NextF /Guardar la nueva dirección en la memoria
+        Jump F_index /Salto al ciclo F_index
+        
